@@ -145,33 +145,32 @@ bool SearchAndRescue::iterativeDeepeningSearch(State *current, int depth_limit)
         terrain[current->x][current->y] = 1;
     }
 
-    vector<State*> expansion = expand(current);
+    vector<State *> expansion = expand(current);
 
     for (int i = 0; i < expansion.size(); i++)
     {
 
-        if ((current->prev_action == "up" && expansion.at(i)->prev_action != "down") || (current->prev_action == "down" && expansion.at(i)->prev_action != "up") || (current->prev_action == "left" && expansion.at(i)->prev_action != "right") || (current->prev_action == "right" && expansion.at(i)->prev_action != "left"))
-        {
-            int original_saved_people = expansion.at(i)->saved_people;
-            int original_terrain = terrain[expansion.at(i)->x][expansion.at(i)->y];
+        int original_saved_people = expansion.at(i)->saved_people;
+        int original_terrain = terrain[expansion.at(i)->x][expansion.at(i)->y];
 
-            path.push_back(expansion.at(i));
-            if (iterativeDeepeningSearch(expansion.at(i), depth_limit - 1))
+        path.push_back(expansion.at(i));
+        if (iterativeDeepeningSearch(expansion.at(i), depth_limit - 1))
+        {
+            return true;
+        }
+        else
+        {
+            path.pop_back();
+            if (expansion.at(i)->saved_people > original_saved_people)
             {
-                return true;
+                expansion.at(i)->saved_people -= 1;
             }
-            else
+            if (terrain[expansion.at(i)->x][expansion.at(i)->y] != original_terrain)
             {
-                path.pop_back();
-                if (expansion.at(i)->saved_people > original_saved_people)
-                {
-                    expansion.at(i)->saved_people -= 1;
-                }
-                if (terrain[expansion.at(i)->x][expansion.at(i)->y] != original_terrain)
-                {
-                    terrain[expansion.at(i)->x][expansion.at(i)->y] = 2;
-                }
+                terrain[expansion.at(i)->x][expansion.at(i)->y] = 2;
             }
+            delete expansion.at(i);
+            expansion.erase(expansion.begin() + i);
         }
     }
     return false;
