@@ -113,7 +113,7 @@ bool SearchAndRescue::iterativeDeepeningWrapper(State *start)
 {
     // TODO
     bool found = false;
-    int depth_limit = 1;
+    int depth_limit = STARTING_DEPTH;
     while (!found)
     {
         found = iterativeDeepeningSearch(start, depth_limit);
@@ -190,7 +190,7 @@ bool SearchAndRescue::isGoal(State *current)
 {
     // TODO
     bool goal = false;
-    if (current->saved_people == 4 && terrain[current->x][current->y] == 3)
+    if (current->saved_people == PEOPLE_TO_SAVE && terrain[current->x][current->y] == 3)
     {
         goal = true;
     }
