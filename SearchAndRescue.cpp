@@ -170,6 +170,7 @@ bool SearchAndRescue::iterativeDeepeningSearch(State *current, int depth_limit)
                 terrain[expansion.at(i)->x][expansion.at(i)->y] = 2;
             }
             delete expansion.at(i);
+            expansion.at(i) = nullptr;
             expansion.erase(expansion.begin() + i);
         }
     }
