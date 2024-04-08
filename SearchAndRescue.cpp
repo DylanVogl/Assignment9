@@ -114,67 +114,67 @@ bool SearchAndRescue::iterativeDeepeningWrapper(State *start)
     // TODO
     bool found = false;
     int depth_limit = STARTING_DEPTH;
+    path.push_back(start);
     while (!found)
     {
         found = iterativeDeepeningSearch(start, depth_limit);
-        if (found)
+        if(found)
         {
             return true;
         }
         else
         {
+            State *temp = path.back();
+            path.pop_back();
+            delete temp;
             depth_limit++;
-        }
+        }    
     }
     return false;
 }
 
 bool SearchAndRescue::iterativeDeepeningSearch(State *current, int depth_limit)
 {
-    if (depth_limit == 0)
-    {
-        return false;
-    }
+    bool found = false;
+    bool saved = false;
+    bool person_to_save = terrain[current->x][current->y] == 2;
     if (isGoal(current))
     {
         return true;
     }
-    if (terrain[current->x][current->y] == 2)
+    if (depth_limit == 0)
     {
-        current->saved_people += 1;
-        terrain[current->x][current->y] = 1;
+        return false;
     }
-
+    int x = current->x;
+    int y = current->y;
+    if (person_to_save)
+    {
+        current->saved_people++;
+        terrain[x][y] = 1;
+        saved = true;
+    }
     vector<State *> expansion = expand(current);
-
     for (int i = 0; i < expansion.size(); i++)
     {
-
-        int original_saved_people = expansion.at(i)->saved_people;
-        int original_terrain = terrain[expansion.at(i)->x][expansion.at(i)->y];
-
         path.push_back(expansion.at(i));
-        if (iterativeDeepeningSearch(expansion.at(i), depth_limit - 1))
+        found = iterativeDeepeningSearch(expansion.at(i), depth_limit - 1);
+        if (found)
         {
             return true;
         }
         else
         {
+            if (saved)
+            {
+                current->saved_people--;
+                terrain[x][y] = 2;
+            }
+            State *temp = path.back();
             path.pop_back();
-            if (expansion.at(i)->saved_people > original_saved_people)
-            {
-                expansion.at(i)->saved_people -= 1;
-            }
-            if (terrain[expansion.at(i)->x][expansion.at(i)->y] != original_terrain)
-            {
-                terrain[expansion.at(i)->x][expansion.at(i)->y] = 2;
-            }
-            delete expansion.at(i);
-            expansion.at(i) = nullptr;
-            expansion.erase(expansion.begin() + i);
+            delete temp;
         }
     }
-    return false;
 }
 
 void SearchAndRescue::printPath()
